@@ -1,0 +1,16 @@
+<p class="h5 m-2">Create new employee:</p>
+<div class="m-2">
+<form novalidate (ngSubmit)="addEmployee(newEmployee)">
+    <div class="form-group">
+    <label>Name</label>
+    <input class="form-control"
+    name="name"
+    [(ngModel)]="newEmployee.name"
+    />
+    </div>
+    <button class="btn btn-primary" type="submit" style="width: 70px;">
+    {{submitBtnText}}
+    <img src="assets/images/loading.gif" [style.display]="imgLoadingDisplay">
+    </button>
+    </form>
+   </div>

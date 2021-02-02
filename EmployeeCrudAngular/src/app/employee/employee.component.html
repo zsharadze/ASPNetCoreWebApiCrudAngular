@@ -1,0 +1,49 @@
+<style>
+    .rowGrayBg {
+        background-color: rgb(222, 226, 224);
+    }
+</style>
+
+<div class="w-50">
+    <table class="w-100">
+        <tr>
+            <td>
+                <p class="h5 float-left pt-2">Employees:</p>
+            </td>
+            <td>
+            <input #searchInput type="search" placeholder="Type to search..." class="form-control" (input)="searchItem(searchInput.value)">           
+            </td>
+            <td class="pl-1">
+                <a href="javascript:void(0)"><i class="fa fa-search"></i></a>
+            </td>
+            <td><button type="button" class="btn btn-primary float-right" (click)="addEmployee()">Add New Employee</button></td>
+        </tr>
+    </table>
+
+    <table class="table">
+        <tr class="btn-primary">
+            <td>Id</td>
+            <td>Name</td>
+            <td>Created Date</td>
+            <td></td>
+            <td><img src="assets/images/loading.gif" [style.display]="imgLoadingDisplay"></td>
+        </tr>
+        <tr *ngFor="let employee of employees | async; let odd=odd;" [class.rowGrayBg]="odd">
+            <td>
+                {{employee.id}}
+            </td>
+            <td>
+                {{employee.name}}
+            </td>
+            <td>
+                {{employee.createdDate}}
+            </td>
+            <td>
+                <a href="javascript:void(0)" (click)="editEmployee(employee.id)"><i class="fa fa-edit"></i></a>
+            </td>
+            <td>
+                <a href="#" (click)="deleteEmployee(employee.id)"><i class="fa fa-trash"></i></a>
+            </td>
+        </tr>
+    </table>
+</div>
