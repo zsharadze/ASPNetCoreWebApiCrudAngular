@@ -31,17 +31,14 @@ export class AddemployeeComponent implements OnInit {
 
     if (employee.id == 0) {
       employee.createdDate = new Date().toISOString();
-      this.employeeService.createEmployee(employee).subscribe();
+      this.employeeService.createEmployee(employee).subscribe(result=>this.router.navigate(['/']));
     }
     else {
       employee.createdDate = new Date().toISOString();
-      this.employeeService.updateEmployee(employee).subscribe();
+      this.employeeService.updateEmployee(employee).subscribe(result=>this.router.navigate(['/']));
     }
     this.submitBtnText = "";
     this.imgLoadingDisplay = 'inline';
-    setTimeout(() => {
-      this.router.navigate(['/']);
-    }, 500);
   }
 
   editEmployee(employeeId: number) {

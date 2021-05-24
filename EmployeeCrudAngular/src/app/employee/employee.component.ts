@@ -26,6 +26,7 @@ export class EmployeeComponent implements OnInit {
 
   getEmployess() {
     this.employees = this.employeeService.getAllEmployee();
+    return this.employees;
   }
 
   addEmployee() {
@@ -33,12 +34,9 @@ export class EmployeeComponent implements OnInit {
   }
 
   deleteEmployee(id: number) {
-    this.employeeService.deleteEmployeeById(id).subscribe();
-    this.imgLoadingDisplay = 'inline';
-    setTimeout(() => {
-      this.getEmployess();
-      this.imgLoadingDisplay = 'none';
-    }, 500);
+    this.employeeService.deleteEmployeeById(id).subscribe(result=>this.getEmployess().subscribe( result=> this.imgLoadingDisplay = 'none'));
+    this.imgLoadingDisplay = 'inline';    
+              
   }
 
   editEmployee(id: number) {
