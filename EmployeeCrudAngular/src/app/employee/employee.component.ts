@@ -12,7 +12,7 @@ import { of } from 'rxjs';
   styleUrls: ['./employee.component.css']
 })
 export class EmployeeComponent implements OnInit {
-  employees: Observable<Employee[]>;
+  employees: Observable<Employee[]> = new Observable<Employee[]>;
   imgLoadingDisplay: string = 'none';
 
   constructor(private employeeService: EmployeeService,

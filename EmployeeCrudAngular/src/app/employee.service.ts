@@ -17,7 +17,7 @@ export class EmployeeService {
     return this.http.get<Employee[]>(this.url).pipe(map((data: Employee[]) =>
       data.map(
         (item: Employee) =>
-          new Employee(item.id, item.name, this.datepipe.transform(item.createdDate, 'dd/MM/yyyy HH:mm:ss'))
+          new Employee(item.id, item.name, this.datepipe.transform(item.createdDate, 'dd/MM/yyyy HH:mm:ss')?.toString())
       )
     )
     );
