@@ -15,4 +15,3 @@ This is ASP.Net Core 5 Web Api and Angular crud example.
 
 ###### About me
 My name is Zviad Sharadze. I'm .Net Developer from Tbilisi, Georgia.
-I'm Microsoft Certified Professional.
