@@ -1,6 +1,6 @@
 # ASPNet Core WebApi Crud Angular Example
 
-This is ASP.Net Core 5 Web Api and Angular crud example.
+This is ASP.Net Core 8 Web Api and Angular crud example.
 
 ## Getting Started
 1. Go to EmployeeCrudApi and open EmployeeCrudApi.sln in Visual Studio.
