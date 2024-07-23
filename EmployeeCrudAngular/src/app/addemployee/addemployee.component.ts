@@ -2,9 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { Employee } from '../employee.model';
 import { EmployeeService } from '../employee.service';
 import { Router, ActivatedRoute, Params } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-addemployee',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
   templateUrl: './addemployee.component.html',
   styleUrls: ['./addemployee.component.css']
 })
@@ -21,6 +25,7 @@ export class AddemployeeComponent implements OnInit {
   ngOnInit(): void {
     this.activatedRoute.queryParams.subscribe(params => {
       const employeeId = params['id'];
+      if(employeeId)
       this.editEmployee(employeeId);
     });
   }

@@ -1,4 +1,4 @@
-﻿using EmployeeCrudApi.Data;
+using EmployeeCrudApi.Data;
 using EmployeeCrudApi.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace EmployeeCrudApi.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class EmployeeController : ControllerBase
     {
@@ -20,40 +20,35 @@ namespace EmployeeCrudApi.Controllers
             _context = context;
         }
 
-        // GET: api/<EmployeeController>
         [HttpGet]
-        public async Task<List<Employee>> Get()
+        public async Task<List<Employee>> GetAll()
         {
             return await _context.Employees.ToListAsync();
         }
 
-        // GET api/<EmployeeController>/5
-        [HttpGet("{id}")]
-        public async Task<Employee> Get(int id)
+        [HttpGet]
+        public async Task<Employee> GetById(int id)
         {
             return await _context.Employees.FindAsync(id);
         }
 
-        // POST api/<EmployeeController>
         [HttpPost]
-        public async Task Post([FromBody] Employee value)
+        public async Task Create([FromBody] Employee employee)
         {
-            value.CreatedDate = DateTime.Now;
-            _context.Employees.Add(value);
+            employee.CreatedDate = DateTime.Now;
+            await _context.Employees.AddAsync(employee);
             await _context.SaveChangesAsync();
         }
 
-        // PUT api/<EmployeeController>/5
-        [HttpPut("{id}")]
-        public async Task Put(int id, [FromBody] Employee value)
+        [HttpPut]
+        public async Task Update([FromBody] Employee employee)
         {
-            Employee employeeToUpdate = await _context.Employees.FindAsync(id);
-            employeeToUpdate.Name = value.Name;
+            Employee employeeToUpdate = await _context.Employees.FindAsync(employee.Id);
+            employeeToUpdate.Name = employee.Name;
             await _context.SaveChangesAsync();
         }
 
-        // DELETE api/<EmployeeController>/5
-        [HttpDelete("{id}")]
+        [HttpDelete]
         public async Task Delete(int id)
         {
             var employeeToDelete = await _context.Employees.FindAsync(id);
