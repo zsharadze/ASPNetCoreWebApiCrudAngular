@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { Employee } from '../employee.model';
-import { EmployeeService } from '../employee.service';
-import { Router, ActivatedRoute, Params } from '@angular/router';
+import { Employee } from '../models/employee.model';
+import { EmployeeService } from '../services/employee.service';
+import { Router, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -9,49 +9,44 @@ import { FormsModule } from '@angular/forms';
   selector: 'app-addemployee',
   standalone: true,
   imports: [CommonModule, FormsModule],
+  providers: [EmployeeService],
   templateUrl: './addemployee.component.html',
-  styleUrls: ['./addemployee.component.css']
+  styleUrls: ['./addemployee.component.css'],
 })
 export class AddemployeeComponent implements OnInit {
-  newEmployee: Employee = new Employee(0, '', '');
-  submitBtnText: string = "Create";
-  imgLoadingDisplay: string = 'none';
+  newEmployee: Employee = new Employee(0, '', null);
+  submitBtnText: string = 'Create';
 
-  constructor(private employeeService: EmployeeService,
+  constructor(
+    private employeeService: EmployeeService,
     private router: Router,
-    private activatedRoute: ActivatedRoute) {
-  }
+    private activatedRoute: ActivatedRoute
+  ) {}
 
   ngOnInit(): void {
-    this.activatedRoute.queryParams.subscribe(params => {
-      const employeeId = params['id'];
-      if(employeeId)
-      this.editEmployee(employeeId);
+    const employeeId = this.activatedRoute.snapshot.paramMap.get('id');
+    if (employeeId) this.getEmployee(Number(employeeId));
+  }
+
+  saveEmployee(employee: Employee) {
+    if (!employee.name) return;
+
+    if (employee.id === 0) {
+      this.employeeService
+        .createEmployee(employee)
+        .subscribe(() => this.router.navigate(['/']));
+    } else {
+      this.employeeService
+        .updateEmployee(employee)
+        .subscribe(() => this.router.navigate(['/']));
+    }
+    this.submitBtnText = '';
+  }
+
+  getEmployee(employeeId: number) {
+    this.employeeService.getEmployeeById(employeeId).subscribe((res) => {
+      this.newEmployee = { ...res } as Employee;
+      this.submitBtnText = 'Edit';
     });
   }
-
-  addEmployee(employee: Employee) {
-    if (employee.name == "")
-      return;
-
-    if (employee.id == 0) {
-      employee.createdDate = new Date().toISOString();
-      this.employeeService.createEmployee(employee).subscribe(result=>this.router.navigate(['/']));
-    }
-    else {
-      employee.createdDate = new Date().toISOString();
-      this.employeeService.updateEmployee(employee).subscribe(result=>this.router.navigate(['/']));
-    }
-    this.submitBtnText = "";
-    this.imgLoadingDisplay = 'inline';
-  }
-
-  editEmployee(employeeId: number) {
-    this.employeeService.getEmployeeById(employeeId).subscribe(res => {
-      this.newEmployee.id = res.id;
-      this.newEmployee.name = res.name
-      this.submitBtnText = "Edit";
-    });
-  }
-
 }

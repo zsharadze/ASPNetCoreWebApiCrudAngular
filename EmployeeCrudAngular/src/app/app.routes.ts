@@ -4,5 +4,6 @@ import { EmployeeComponent } from './employee/employee.component';
 
 export const routes: Routes = [
   { path: 'addemployee', component: AddemployeeComponent },
+  { path: 'addemployee/:id', component: AddemployeeComponent },
   { path: '**', component: EmployeeComponent },
 ];

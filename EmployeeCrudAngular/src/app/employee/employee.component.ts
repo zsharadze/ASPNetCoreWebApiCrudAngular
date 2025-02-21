@@ -1,22 +1,38 @@
-import { Component, OnInit } from '@angular/core';
-import { EmployeeService } from '../employee.service';
-import { Employee } from '../employee.model';
-import { Observable } from 'rxjs';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { EmployeeService } from '../services/employee.service';
+import { Employee } from '../models/employee.model';
+import {
+  fromEvent,
+  Observable,
+  Subject,
+  Subscription,
+} from 'rxjs';
 import { Router } from '@angular/router';
-import { map } from 'rxjs/operators';
+import {
+  debounceTime,
+  distinctUntilChanged,
+  map,
+  switchMap,
+  takeUntil,
+} from 'rxjs/operators';
 import { of } from 'rxjs';
 import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-employee',
   standalone: true,
-  imports:[CommonModule],
+  imports: [CommonModule],
+  providers: [EmployeeService],
   templateUrl: './employee.component.html',
   styleUrls: ['./employee.component.css'],
 })
 export class EmployeeComponent implements OnInit {
-  employees: Observable<Employee[]> = new Observable<Employee[]>();
-  imgLoadingDisplay: string = 'none';
+  employees$: Observable<Employee[]> = new Observable<Employee[]>();
+  private unsubscribe$ = new Subject<string>();
+  searchText: string = '';
+  searchSubcription: Subscription = {} as Subscription;
+  @ViewChild('searchInput', { static: true }) searchInput: ElementRef =
+    {} as ElementRef;
 
   constructor(
     private employeeService: EmployeeService,
@@ -27,9 +43,34 @@ export class EmployeeComponent implements OnInit {
     this.getEmployess();
   }
 
+  ngAfterViewInit(): void {
+    this.getSearchedEmployess();
+  }
+
+  getSearchedEmployess(): void {
+    this.searchSubcription = fromEvent<any>(
+      this.searchInput.nativeElement,
+      'input'
+    )
+      .pipe(
+        debounceTime(400),
+        map((event) => {
+          this.searchText = event.target.value;
+          return this.searchText;
+        }),
+        distinctUntilChanged(),
+        switchMap((val) => this.employeeService.getAllEmployee(val)),
+        takeUntil(this.unsubscribe$)
+      )
+      .subscribe((res) => {
+        this.employees$ = of(res) as Observable<Employee[]>;
+      });
+  }
+
   getEmployess() {
-    this.employees = this.employeeService.getAllEmployee();
-    return this.employees;
+    this.employees$ = this.employeeService.getAllEmployee(
+      this.searchText
+    ) as Observable<Employee[]>;
   }
 
   addEmployee() {
@@ -39,41 +80,15 @@ export class EmployeeComponent implements OnInit {
   deleteEmployee(id: number) {
     this.employeeService
       .deleteEmployeeById(id)
-      .subscribe((result) =>
-        this.getEmployess().subscribe(
-          (result) => (this.imgLoadingDisplay = 'none')
-        )
-      );
-    this.imgLoadingDisplay = 'inline';
+      .subscribe(() => this.getEmployess());
   }
 
   editEmployee(id: number) {
-    this.router.navigate(['/addemployee'], { queryParams: { id: id } });
+    this.router.navigate(['/addemployee', id]);
   }
 
-  searchItem(value: string) {
-    this.employeeService.getAllEmployee().subscribe((res) => {
-      this.employees = of(res);
-
-      this.employees
-        .pipe(
-          map((plans) =>
-            plans.filter((results, emp) => results.name.indexOf(value) != -1)
-          )
-        )
-        .subscribe((results) => {
-          let employeeList: Employee[] = [];
-          for (let index = 0; index < results.length; index++) {
-            employeeList.push(
-              new Employee(
-                results[index].id,
-                results[index].name,
-                results[index].createdDate
-              )
-            );
-          }
-          this.employees = of(employeeList);
-        });
-    });
+  ngOnDestroy(): void {
+    this.unsubscribe$.next('unsubscribe emit');
+    this.unsubscribe$.complete();
   }
 }

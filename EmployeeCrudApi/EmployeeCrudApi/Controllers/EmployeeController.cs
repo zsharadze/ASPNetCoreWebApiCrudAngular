@@ -1,4 +1,6 @@
+using AutoMapper;
 using EmployeeCrudApi.Data;
+using EmployeeCrudApi.DTOs;
 using EmployeeCrudApi.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -13,47 +15,95 @@ namespace EmployeeCrudApi.Controllers
     [ApiController]
     public class EmployeeController : ControllerBase
     {
-        private ApplicationDbContext _context;
+        private readonly ApplicationDbContext _context;
+        private readonly IMapper _mapper;
 
-        public EmployeeController(ApplicationDbContext context)
+        public EmployeeController(ApplicationDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         [HttpGet]
-        public async Task<List<Employee>> GetAll()
+        [ProducesResponseType(typeof(List<EmployeeDTO>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetAll(string searchText)
         {
-            return await _context.Employees.ToListAsync();
+            if (!string.IsNullOrEmpty(searchText))
+            {
+                var employees = await _context.Employees.Where(x => x.Name.StartsWith(searchText)).ToListAsync();
+                return Ok(_mapper.Map<List<EmployeeDTO>>(employees));
+            }
+            else
+            {
+                var employees = await _context.Employees.ToListAsync();
+                return Ok(_mapper.Map<List<EmployeeDTO>>(employees));
+            }
         }
 
         [HttpGet]
-        public async Task<Employee> GetById(int id)
+        [ProducesResponseType(typeof(EmployeeDTO), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetById(int id)
         {
-            return await _context.Employees.FindAsync(id);
+            var employee = await _context.Employees.FindAsync(id);
+            return Ok(_mapper.Map<EmployeeDTO>(employee));
         }
 
         [HttpPost]
-        public async Task Create([FromBody] Employee employee)
+        [ProducesResponseType(typeof(EmployeeDTO), StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> Create([FromBody] EmployeeDTO employee)
         {
             employee.CreatedDate = DateTime.Now;
-            await _context.Employees.AddAsync(employee);
-            await _context.SaveChangesAsync();
+            var employeeEntity = _mapper.Map<Employee>(employee);
+            await _context.Employees.AddAsync(employeeEntity);
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+            return CreatedAtAction(nameof(Create), employee);
         }
 
         [HttpPut]
-        public async Task Update([FromBody] Employee employee)
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> Update([FromBody] EmployeeDTO employee)
         {
             Employee employeeToUpdate = await _context.Employees.FindAsync(employee.Id);
             employeeToUpdate.Name = employee.Name;
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+            return NoContent();
         }
 
         [HttpDelete]
-        public async Task Delete(int id)
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> Delete(int id)
         {
             var employeeToDelete = await _context.Employees.FindAsync(id);
             _context.Remove(employeeToDelete);
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+            return NoContent();
         }
     }
 }
