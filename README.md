@@ -1,6 +1,7 @@
 # ASPNet Core WebApi Crud Angular Example
 
 This is ASP.Net Core 8 Web Api and Angular crud example.
+Usage of debounceTime on search, interceptor to show loading when there is API call, automapper and EntityFramework Core.
 
 ## Getting Started
 1. Go to EmployeeCrudApi and open EmployeeCrudApi.sln in Visual Studio.
