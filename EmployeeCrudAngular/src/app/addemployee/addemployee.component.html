@@ -1,6 +1,6 @@
 <p class="h5 m-2">Create new employee:</p>
 <div class="m-2">
-  <form novalidate (ngSubmit)="saveEmployee(newEmployee)">
+  <form novalidate (ngSubmit)="saveEmployee()">
     <div class="form-group" style="max-width: 300px">
       <label>Name</label>
       <input class="form-control" name="name" [(ngModel)]="newEmployee.name" />

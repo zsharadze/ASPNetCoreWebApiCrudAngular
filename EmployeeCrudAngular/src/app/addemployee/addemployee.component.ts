@@ -28,16 +28,16 @@ export class AddemployeeComponent implements OnInit {
     if (employeeId) this.getEmployee(Number(employeeId));
   }
 
-  saveEmployee(employee: Employee) {
-    if (!employee.name) return;
+  saveEmployee() {
+    if (!this.newEmployee.name) return;
 
-    if (employee.id === 0) {
+    if (this.newEmployee.id === 0) {
       this.employeeService
-        .createEmployee(employee)
+        .createEmployee(this.newEmployee)
         .subscribe(() => this.router.navigate(['/']));
     } else {
       this.employeeService
-        .updateEmployee(employee)
+        .updateEmployee(this.newEmployee)
         .subscribe(() => this.router.navigate(['/']));
     }
     this.submitBtnText = '';
