@@ -30,7 +30,6 @@ export class EmployeeComponent implements OnInit {
   employees$: Observable<Employee[]> = new Observable<Employee[]>();
   private unsubscribe$ = new Subject<string>();
   searchText: string = '';
-  searchSubcription: Subscription = {} as Subscription;
   @ViewChild('searchInput', { static: true }) searchInput: ElementRef =
     {} as ElementRef;
 
@@ -48,7 +47,7 @@ export class EmployeeComponent implements OnInit {
   }
 
   getSearchedEmployess(): void {
-    this.searchSubcription = fromEvent<any>(
+    fromEvent<any>(
       this.searchInput.nativeElement,
       'input'
     )
