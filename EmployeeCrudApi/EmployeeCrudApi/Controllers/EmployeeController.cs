@@ -73,10 +73,10 @@ namespace EmployeeCrudApi.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Update([FromBody] EmployeeDTO employee)
         {
-            Employee employeeToUpdate = await _context.Employees.FindAsync(employee.Id);
-            employeeToUpdate.Name = employee.Name;
+            var employeeToUpdate = _mapper.Map<Employee>(employee);
             try
             {
+                _context.Employees.Update(employeeToUpdate);
                 await _context.SaveChangesAsync();
             }
             catch (Exception ex)
